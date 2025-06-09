@@ -78,6 +78,24 @@ setup_installer_script() {
   log "✓ Python installer script ready"
 }
 
+ensure_sudo() {
+  print_section_header "Ensuring Sudo Permissions"
+  if check_sudo; then # check_sudo returns 0 if not root, 1 if root
+    log_success "Running as a regular user."
+    log_status "Verifying sudo access..."
+    if ! sudo -v &>/dev/null; then
+      log_error "sudo is not configured or password not entered correctly. Please fix sudo access."
+      exit 1
+    fi
+    log_success "Sudo access verified."
+  else
+    log_warn "This script should NOT be run directly with sudo."
+    log_warn "It needs to run as a regular user to correctly configure user-specific files (e.g., ~/.config, ~/.bashrc)."
+    log_error "Please run: bash ${BASH_SOURCE[0]}"
+    exit 1
+  fi
+}
+
 # Main function
 main() {
   echo -e "${BLUE}"
@@ -92,6 +110,7 @@ main() {
   # Perform checks
   check_root
   check_arch
+  ensure_sudo
 
   # Setup
   log "Installing dependencies..."
