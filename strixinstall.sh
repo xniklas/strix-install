@@ -67,7 +67,7 @@ install_dependencies() {
 # Download the Python script if it doesn't exist
 setup_installer_script() {
   SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-  PYTHON_SCRIPT="$SCRIPT_DIR/installer.py"
+  PYTHON_SCRIPT="installer.py"
 
   if [[ ! -f "$PYTHON_SCRIPT" ]]; then
     error "installer.py not found in the same directory as this script!"
@@ -105,7 +105,7 @@ main() {
 
   # Run the Python installer
   SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-  python "$SCRIPT_DIR/installer.py"
+  python "installer.py"
 }
 
 # Trap to handle interrupts
