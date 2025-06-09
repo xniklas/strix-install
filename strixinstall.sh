@@ -66,7 +66,7 @@ install_dependencies() {
 
 # Download the Python script if it doesn't exist
 setup_installer_script() {
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+  SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
   PYTHON_SCRIPT="$SCRIPT_DIR/installer.py"
 
   if [[ ! -f "$PYTHON_SCRIPT" ]]; then
@@ -104,7 +104,7 @@ main() {
   echo ""
 
   # Run the Python installer
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+  SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
   python "$SCRIPT_DIR/installer.py"
 }
 

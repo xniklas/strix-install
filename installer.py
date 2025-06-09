@@ -39,11 +39,13 @@ class ArchInstaller:
 
     def setup_layout(self):
         """Create the TUI layout structure"""
-        # Split main layout: header, body, footer
+        # Split main layout: header, body, spacer, input, spacer
         self.layout.split_column(
             Layout(name="header", size=3),
             Layout(name="body"),
+            Layout(name="spacer1", size=2),  # Add space above input
             Layout(name="input_area", size=3),
+            Layout(name="spacer2", size=1),  # Add space below input
         )
 
         # Split body into left panel (status + logs) and right panel (pacman output)
@@ -80,7 +82,7 @@ class ArchInstaller:
 
         # Custom logs area
         log_content = Text()
-        recent_logs = self.custom_logs[-15:]  # Show last 15 entries
+        recent_logs = self.custom_logs[-12:]  # Reduced to fit better
         for log in recent_logs:
             log_content.append(f"{log}\n")
         self.layout["logs"].update(
@@ -89,18 +91,29 @@ class ArchInstaller:
 
         # Pacman output area
         pacman_content = Text()
-        recent_output = self.pacman_output[-25:]  # Show last 25 lines
+        recent_output = self.pacman_output[-20:]  # Reduced to fit better
         for line in recent_output:
             pacman_content.append(f"{line}\n")
         self.layout["right_panel"].update(
             Panel(pacman_content, title="Pacman/Yay Output", border_style="cyan")
         )
 
-        # Input area
+        # Spacers
+        self.layout["spacer1"].update(Panel("", style="dim", border_style="dim"))
+        self.layout["spacer2"].update(Panel("", style="dim", border_style="dim"))
+
+        # Input area - more prominent
         input_text = Text(
-            "Enter your choice or press Enter to continue...", style="bold white"
+            ">>> Enter your choice or press Enter to continue <<<",
+            style="bold yellow on blue",
         )
-        self.layout["input_area"].update(Panel(Align.center(input_text), style="white"))
+        self.layout["input_area"].update(
+            Panel(
+                Align.center(input_text),
+                style="bold white",
+                border_style="bright_white",
+            )
+        )
 
     def add_log(self, message: str, log_type: str = "INFO"):
         """Add a message to custom logs"""
@@ -134,9 +147,11 @@ class ArchInstaller:
         self.installation_status = f"Installing {package}..."
         self.add_log(f"Starting installation of {package}")
 
-        # Choose command
-        cmd = ["yay", "-S"] if use_yay else ["sudo", "pacman", "-S"]
-        cmd.append(package)
+        # Choose command with --noconfirm and sudo for pacman
+        if use_yay:
+            cmd = ["yay", "-S", "--noconfirm", package]
+        else:
+            cmd = ["sudo", "pacman", "-S", "--noconfirm", package]
 
         try:
             # Start process with pipes for output capture but preserve stdin
@@ -256,7 +271,7 @@ class ArchInstaller:
 def main():
     """Main entry point"""
     # Example package lists - customize these
-    regular_packages = ["git", "base-devel"]
+    regular_packages = ["vim", "git", "htop", "neofetch", "base-devel"]
 
     aur_packages = [
         # "visual-studio-code-bin",
